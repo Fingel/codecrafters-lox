@@ -73,6 +73,24 @@ impl Scanner {
         }
     }
 
+    fn string(&mut self) {
+        while self.peek() != '"' && !self.is_at_end() {
+            if self.peek() == '\n' {
+                self.line += 1;
+            }
+            self.advance();
+        }
+        if self.is_at_end() {
+            self.error_reporter.error(self.line, "Unterminated string.");
+            return;
+        }
+        self.advance();
+
+        // Trim the surrounding quotes
+        let lexeme = self.source[self.start + 1..self.current - 1].to_string();
+        self.add_literal_token(TokenType::String, Some(Object::String(lexeme)));
+    }
+
     fn add_token(&mut self, token_type: TokenType) {
         self.add_literal_token(token_type, None);
     }
@@ -140,6 +158,7 @@ impl Scanner {
             }
             ' ' | '\r' | '\t' => {}
             '\n' => self.line += 1,
+            '"' => self.string(),
             _ => self
                 .error_reporter
                 .error(self.line, &format!("Unexpected character: {}", c)),

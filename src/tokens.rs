@@ -23,6 +23,7 @@ pub enum TokenType {
     LessEqual,
     Greater,
     GreaterEqual,
+    String,
     Eof,
 }
 
@@ -55,7 +56,7 @@ pub enum Object {
 impl fmt::Display for Object {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Object::String(s) => write!(f, "\"{}\"", s),
+            Object::String(s) => write!(f, "{}", s),
             Object::Number(n) => write!(f, "{}", n),
             Object::Boolean(b) => write!(f, "{}", b),
             Object::Nil => write!(f, "nil"),
