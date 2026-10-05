@@ -118,6 +118,14 @@ impl Scanner {
         self.add_literal_token(TokenType::Number, Some(Object::Number(lexeme)));
     }
 
+    fn identifier(&mut self) {
+        while self.peek().is_alphanumeric() || self.peek() == '_' {
+            self.advance();
+        }
+        let text = self.source[self.start..self.current].to_string();
+        self.add_literal_token(TokenType::Identifier, None);
+    }
+
     fn add_token(&mut self, token_type: TokenType) {
         self.add_literal_token(token_type, None);
     }
@@ -189,6 +197,8 @@ impl Scanner {
             _ => {
                 if c.is_numeric() {
                     self.number();
+                } else if c.is_alphabetic() || c == '_' {
+                    self.identifier();
                 } else {
                     self.error_reporter
                         .error(self.line, &format!("Unexpected character: {}", c));
