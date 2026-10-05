@@ -101,6 +101,13 @@ impl Scanner {
             '+' => self.add_token(TokenType::Plus),
             ';' => self.add_token(TokenType::Semicolon),
             '*' => self.add_token(TokenType::Star),
+            '=' => {
+                if self.match_token('=') {
+                    self.add_token(TokenType::EqualEqual);
+                } else {
+                    self.add_token(TokenType::Equal);
+                }
+            }
             '/' => {
                 if self.match_token('/') {
                     while self.peek() != '\n' && !self.is_at_end() {
