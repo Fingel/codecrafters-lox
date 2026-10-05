@@ -73,6 +73,14 @@ impl Scanner {
         }
     }
 
+    fn peek_next(&self) -> char {
+        if self.current + 1 >= self.source.chars().count() {
+            '\0'
+        } else {
+            self.char_at(self.current + 1)
+        }
+    }
+
     fn string(&mut self) {
         while self.peek() != '"' && !self.is_at_end() {
             if self.peek() == '\n' {
@@ -89,6 +97,25 @@ impl Scanner {
         // Trim the surrounding quotes
         let lexeme = self.source[self.start + 1..self.current - 1].to_string();
         self.add_literal_token(TokenType::String, Some(Object::String(lexeme)));
+    }
+
+    fn number(&mut self) {
+        while self.peek().is_numeric() {
+            self.advance();
+        }
+
+        // Look for a fraction part
+        if self.peek() == '.' && self.peek_next().is_numeric() {
+            self.advance();
+            while self.peek().is_numeric() {
+                self.advance();
+            }
+        }
+
+        let lexeme = self.source[self.start..self.current]
+            .parse::<f64>()
+            .unwrap();
+        self.add_literal_token(TokenType::Number, Some(Object::Number(lexeme)));
     }
 
     fn add_token(&mut self, token_type: TokenType) {
@@ -159,9 +186,14 @@ impl Scanner {
             ' ' | '\r' | '\t' => {}
             '\n' => self.line += 1,
             '"' => self.string(),
-            _ => self
-                .error_reporter
-                .error(self.line, &format!("Unexpected character: {}", c)),
+            _ => {
+                if c.is_numeric() {
+                    self.number();
+                } else {
+                    self.error_reporter
+                        .error(self.line, &format!("Unexpected character: {}", c));
+                }
+            }
         }
     }
 }
