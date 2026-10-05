@@ -108,6 +108,13 @@ impl Scanner {
                     self.add_token(TokenType::Equal);
                 }
             }
+            '!' => {
+                if self.match_token('=') {
+                    self.add_token(TokenType::BangEqual);
+                } else {
+                    self.add_token(TokenType::Bang);
+                }
+            }
             '/' => {
                 if self.match_token('/') {
                     while self.peek() != '\n' && !self.is_at_end() {

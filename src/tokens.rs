@@ -15,6 +15,8 @@ pub enum TokenType {
     Semicolon,
     Star,
     Slash,
+    Bang,
+    BangEqual,
     Equal,
     EqualEqual,
     Eof,
