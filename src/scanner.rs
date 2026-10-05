@@ -71,6 +71,8 @@ impl Scanner {
         match c {
             '(' => self.add_token(TokenType::LeftParen),
             ')' => self.add_token(TokenType::RightParen),
+            '{' => self.add_token(TokenType::LeftBrace),
+            '}' => self.add_token(TokenType::RightBrace),
             ' ' | '\r' | '\t' => {}
             '\n' => self.line += 1,
             _ => unimplemented!("Only parens are implemented for now. Found: {}", c),
