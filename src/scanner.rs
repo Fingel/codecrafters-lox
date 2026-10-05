@@ -115,6 +115,20 @@ impl Scanner {
                     self.add_token(TokenType::Bang);
                 }
             }
+            '<' => {
+                if self.match_token('=') {
+                    self.add_token(TokenType::LessEqual);
+                } else {
+                    self.add_token(TokenType::Less);
+                }
+            }
+            '>' => {
+                if self.match_token('=') {
+                    self.add_token(TokenType::GreaterEqual);
+                } else {
+                    self.add_token(TokenType::Greater);
+                }
+            }
             '/' => {
                 if self.match_token('/') {
                     while self.peek() != '\n' && !self.is_at_end() {
