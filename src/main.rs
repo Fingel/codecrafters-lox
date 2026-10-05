@@ -1,17 +1,19 @@
 #![allow(unused_variables)]
 use std::env;
 use std::fs;
+use std::process::ExitCode;
 
 use crate::scanner::Scanner;
 
+mod error_reporter;
 mod scanner;
 mod tokens;
 
-fn main() {
+fn main() -> ExitCode {
     let args: Vec<String> = env::args().collect();
     if args.len() < 3 {
         eprintln!("Usage: {} tokenize <filename>", args[0]);
-        return;
+        return ExitCode::FAILURE;
     }
 
     let command = &args[1];
@@ -27,19 +29,25 @@ fn main() {
                 String::new()
             });
 
-            // TODO: Uncomment the code below to pass the first stage
             if !file_contents.is_empty() {
                 let mut scanner = Scanner::new(file_contents);
                 let tokens = scanner.scan_tokens();
                 for token in tokens {
                     println!("{}", token);
                 }
+                if scanner.error_reporter.had_error {
+                    ExitCode::from(65)
+                } else {
+                    ExitCode::SUCCESS
+                }
             } else {
                 println!("EOF  null"); // Placeholder, replace this line when implementing the scanner
+                ExitCode::SUCCESS
             }
         }
         _ => {
             eprintln!("Unknown command: {}", command);
+            ExitCode::FAILURE
         }
     }
 }

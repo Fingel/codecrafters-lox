@@ -1,8 +1,12 @@
-use crate::tokens::{Object, Token, TokenType};
+use crate::{
+    error_reporter::ErrorReporter,
+    tokens::{Object, Token, TokenType},
+};
 
 pub struct Scanner {
     source: String,
     tokens: Vec<Token>,
+    pub error_reporter: ErrorReporter,
     start: usize,
     current: usize,
     line: u32,
@@ -13,6 +17,7 @@ impl Scanner {
         Scanner {
             source,
             tokens: Vec::new(),
+            error_reporter: ErrorReporter::new(),
             start: 0,
             current: 0,
             line: 1,
@@ -107,7 +112,9 @@ impl Scanner {
             }
             ' ' | '\r' | '\t' => {}
             '\n' => self.line += 1,
-            _ => unimplemented!("Only parens are implemented for now. Found: {}", c),
+            _ => self
+                .error_reporter
+                .error(self.line, &format!("Unexpected character: {}", c)),
         }
     }
 }
