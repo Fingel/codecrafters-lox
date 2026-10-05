@@ -51,6 +51,23 @@ impl Scanner {
             .expect("Tried to scan past the end of the source string!")
     }
 
+    fn match_token(&mut self, expected: char) -> bool {
+        if self.is_at_end() || self.peek() != expected {
+            return false;
+        }
+        self.current += 1;
+
+        true
+    }
+
+    fn peek(&self) -> char {
+        if self.is_at_end() {
+            '\0'
+        } else {
+            self.char_at(self.current)
+        }
+    }
+
     fn add_token(&mut self, token_type: TokenType) {
         self.add_literal_token(token_type, None);
     }
@@ -73,6 +90,21 @@ impl Scanner {
             ')' => self.add_token(TokenType::RightParen),
             '{' => self.add_token(TokenType::LeftBrace),
             '}' => self.add_token(TokenType::RightBrace),
+            ',' => self.add_token(TokenType::Comma),
+            '.' => self.add_token(TokenType::Dot),
+            '-' => self.add_token(TokenType::Minus),
+            '+' => self.add_token(TokenType::Plus),
+            ';' => self.add_token(TokenType::Semicolon),
+            '*' => self.add_token(TokenType::Star),
+            '/' => {
+                if self.match_token('/') {
+                    while self.peek() != '\n' && !self.is_at_end() {
+                        self.advance();
+                    }
+                } else {
+                    self.add_token(TokenType::Slash);
+                }
+            }
             ' ' | '\r' | '\t' => {}
             '\n' => self.line += 1,
             _ => unimplemented!("Only parens are implemented for now. Found: {}", c),
